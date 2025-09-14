@@ -1,0 +1,3 @@
+#pragma once
+
+#define WIFI_CREDENTIALS_JSON_BUFFER_SIZE 1024

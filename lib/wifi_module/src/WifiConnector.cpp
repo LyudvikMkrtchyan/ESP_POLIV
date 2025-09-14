@@ -1,0 +1,117 @@
+#include <Arduino.h>
+#include <FS.h>
+#include <LittleFS.h>
+#include <ArduinoJson.h>
+#include <vector>
+#include <string>
+#include <ESP8266WiFi.h>
+
+
+#include "WifiConnector.h"
+#include "WiFiCredentials.h"
+
+
+
+std::vector<WiFiCredentials> WifiConnector::load_wifi_credentials_from_config(const char* filePath) {
+    std::vector<WiFiCredentials> creds;
+
+    if (!LittleFS.begin()) {
+        Serial.println(F("Failed to mount file system"));
+        return creds;
+    }
+
+    File file = LittleFS.open(filePath, "r");
+    if (!file) {
+        Serial.println(F("Failed to open config file"));
+        Serial.println(filePath);
+        return creds;
+    }
+
+
+    StaticJsonDocument<1024> doc;
+    DeserializationError error = deserializeJson(doc, file);
+
+    if (error) {
+        Serial.print(F("JSON parse error: "));
+        Serial.println(error.c_str());
+        return creds;
+    }
+
+    JsonArray arr = doc.as<JsonArray>();
+    for (JsonObject obj : arr) {
+        String ssid = obj["ssid"].as<String>();
+        String password = obj["password"].as<String>();
+        creds.emplace_back(ssid, password);
+    }
+
+    file.close();
+    return creds;
+}
+
+bool WifiConnector::has_connection() {
+    
+    int reconect_attempts = 5;
+    while(reconect_attempts)
+        {
+        if(WiFi.status() == WL_CONNECTED) {
+            return true;
+        }
+        connect_to_wifi();
+    }
+    return false;
+}
+
+
+void WifiConnector::connect_to_wifi() {
+    if (wifi_cridentals_list_.empty()) {
+        Serial.println(F("[WiFi] No credentials loaded."));
+        return;
+    }
+
+    for (const auto& cred : wifi_cridentals_list_) {
+        Serial.println(F("==================================="));
+        Serial.print(F("[WiFi] Trying SSID: "));
+        Serial.println(cred.get_ssid());
+
+        WiFi.mode(WIFI_STA);
+        WiFi.begin(cred.get_ssid().c_str(), cred.get_password().c_str());
+
+        unsigned long startAttemptTime = millis();
+        const unsigned long timeout = 15000;
+
+        while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+            delay(500);
+            Serial.print(F("."));
+        }
+        Serial.println();
+
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.println(F("[WiFi] Connected successfully!"));
+            Serial.print(F("[WiFi] SSID: "));
+            Serial.println(WiFi.SSID());
+            Serial.print(F("[WiFi] IP Address: "));
+            Serial.println(WiFi.localIP());
+            Serial.print(F("[WiFi] Signal strength (RSSI): "));
+            Serial.print(WiFi.RSSI());
+            Serial.println(F(" dBm"));
+            Serial.println(F("==================================="));
+            return;
+        } else {
+            Serial.print(F("[WiFi] Failed to connect to SSID: "));
+            Serial.println(cred.get_ssid());
+        }
+    }
+
+    Serial.println(F("[WiFi] Could not connect to any configured network."));
+}
+
+
+
+
+
+WifiConnector::WifiConnector(WifiConnector::Params const& params):params_(params) {
+    wifi_cridentals_list_ = load_wifi_credentials_from_config(params.cridentals_list_file_path.c_str());
+    for (const auto& cred : wifi_cridentals_list_) {
+        cred.print_WiFiCredentials_info();
+    }
+}

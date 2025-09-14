@@ -1,0 +1,8 @@
+{
+  "name": "wifi_module",
+  "version": "1.0",
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src"
+  }
+}
