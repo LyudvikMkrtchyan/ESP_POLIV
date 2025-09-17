@@ -1,3 +1,4 @@
+#include <logger.h>
 #include <Arduino.h>
 #include <FS.h>
 #include <LittleFS.h>
@@ -10,7 +11,21 @@
 #include "WifiConnector.h"
 #include "WiFiCredentials.h"
 
+bool WifiConnector::init(WifiConnector::Params params) {
+    WifiConnector& instance = getInstance();
+    instance.params_ = params;
 
+    instance.wifi_credentials_list_ =
+        instance.load_wifi_credentials_from_config(instance.params_.credentials_list_file_path.c_str());
+
+    return !instance.wifi_credentials_list_.empty();
+}
+
+
+WifiConnector& WifiConnector::getInstance() {
+    static WifiConnector instance;
+    return instance;
+}
 
 std::vector<WiFiCredentials> WifiConnector::load_wifi_credentials_from_config(const char* filePath) {
     std::vector<WiFiCredentials> creds;
@@ -62,13 +77,14 @@ bool WifiConnector::has_connection() {
 }
 
 
+
 void WifiConnector::connect_to_wifi() {
-    if (wifi_cridentals_list_.empty()) {
+    if (wifi_credentials_list_.empty()) {
         Serial.println(F("[WiFi] No credentials loaded."));
         return;
     }
 
-    for (const auto& cred : wifi_cridentals_list_) {
+    for (const auto& cred : wifi_credentials_list_) {
         Serial.println(F("==================================="));
         Serial.print(F("[WiFi] Trying SSID: "));
         Serial.println(cred.get_ssid());
@@ -106,12 +122,3 @@ void WifiConnector::connect_to_wifi() {
 }
 
 
-
-
-
-WifiConnector::WifiConnector(WifiConnector::Params const& params):params_(params) {
-    wifi_cridentals_list_ = load_wifi_credentials_from_config(params.cridentals_list_file_path.c_str());
-    for (const auto& cred : wifi_cridentals_list_) {
-        cred.print_WiFiCredentials_info();
-    }
-}

@@ -1,11 +1,15 @@
 [
   {
-    "ssid": "BeelineSM25_FB47",
-    "password": "03183505"
+    "ssid": "GSLine_100_2.4GHz",
+    "password": "19911234"
   },
   {
     "ssid": "Redmi 10",
     "password": "98683968"
+  },
+  {
+    "ssid": "BeelineSM25_FB47",
+    "password": "03183505"
   },
   {
     "ssid": "Rostelecom_51721",

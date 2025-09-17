@@ -37,15 +37,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
+
+
 void setup() {
   initalizePins();
+  setup_wifi();
   Serial.begin(9600);
 
-  // WiFi подключение через твой класс
-  WifiConnector::Params wifi_connector_params;
-  wifi_connector_params.cridentals_list_file_path = "/config_files/wifi_credentals.json";
-  WifiConnector wifi_connector(wifi_connector_params);
-  wifi_connector.connect_to_wifi();
+
 
   // Настройка MQTT
   client.setServer(mqtt_server, mqtt_port);

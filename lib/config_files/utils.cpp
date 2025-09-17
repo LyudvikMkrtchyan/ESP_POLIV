@@ -1,5 +1,8 @@
 #include "utils.h"
 #include <Arduino.h>
+#include <set>
+#include <WifiConnector.h>
+#include <logger.h>
 
 
 std::map <int, int> pinToName = {
@@ -49,4 +52,23 @@ int get_external_pin(const int name) {
          return it->second;  // 👉 value
     }
     return -1; // not found
+}
+
+void setup_wifi() {
+      // WiFi подключение через твой класс
+  WifiConnector::Params wifi_connector_params;
+  
+  wifi_connector_params.credentials_list_file_path = "/config_files/wifi_credentals.json";
+
+  WifiConnector::init(wifi_connector_params);
+  WifiConnector::getInstance().connect_to_wifi();
+
+    if (WifiConnector::getInstance().has_connection()) {
+        Logger::log_info("WiFi connected successfully.");
+    } else {
+        Logger::log_warning(String("Failed to connect to WiFi. [") +
+                    __FILE__ + ":" + String(__LINE__) + "]");
+
+    }
+
 }
