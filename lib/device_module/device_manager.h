@@ -7,6 +7,7 @@ public:
     DeviceManager();
     void handele_job(const JobParams& job);
     void print_state();
+    String
 
 private:
     void init_devices();

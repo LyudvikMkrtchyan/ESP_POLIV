@@ -1,5 +1,9 @@
 [
   {
+    "ssid": "Rostelecom_51721",
+    "password": "23e4b821"
+  },
+  {
     "ssid": "GSLine_100_2.4GHz",
     "password": "19911234"
   },
@@ -10,10 +14,6 @@
   {
     "ssid": "BeelineSM25_FB47",
     "password": "03183505"
-  },
-  {
-    "ssid": "Rostelecom_51721",
-    "password": "23e4b821"
   },
   {
     "ssid": "S22",

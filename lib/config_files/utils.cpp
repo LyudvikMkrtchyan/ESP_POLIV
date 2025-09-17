@@ -2,7 +2,9 @@
 #include <Arduino.h>
 #include <set>
 #include <WifiConnector.h>
+#include <backend_server.h>
 #include <logger.h>
+#include <string>
 
 
 std::map <int, int> pinToName = {
@@ -70,5 +72,12 @@ void setup_wifi() {
                     __FILE__ + ":" + String(__LINE__) + "]");
 
     }
+
+}
+void setup_backend_servers() {
+    // BackendServers подключение через твой класс
+  std::string backend_server_config_file_path = "/config_files/backend_servers_config.json";
+ Logger::log_info("Initializing Backend Servers with config file: " + String(backend_server_config_file_path.c_str()));
+  BackendServers::init(backend_server_config_file_path);
 
 }

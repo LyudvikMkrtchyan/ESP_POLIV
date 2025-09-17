@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include <WifiConnector.h>
 #include <WiFiCredentials.h>
+#include <backend_server.h>
 #include <job_params.h>
 #include "device_manager.h"
 
@@ -38,17 +39,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 
-
 void setup() {
+  Serial.begin(9600);
   initalizePins();
   setup_wifi();
-  Serial.begin(9600);
+  setup_backend_servers();
 
 
 
   // Настройка MQTT
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
+
+  auto backend_servers = BackendServers::getInstance();
+  backend_server::RequestParams request_params;
+  request_params.type = backend_server::RequestType::POST;
+  request_params.endpoint = "ping";
+  request_params.body = "{\"ping\": \"pong\"}";
+  backend_servers.send_request(request_params);
 }
 
 // Функция для переподключения к MQTT, если связь упала
