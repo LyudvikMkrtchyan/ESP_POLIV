@@ -34,6 +34,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   if (currentJob.fromJson(msg)) {
     Serial.println("Новая задача получена!");
+    Serial.println("" + currentJob.toJson());
     jobReceived = true;
   }
 }

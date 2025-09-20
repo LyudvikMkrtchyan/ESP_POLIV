@@ -1,4 +1,12 @@
 [
+    {
+    "ssid": "MI 8 Pro",
+    "password": "12344321"
+  },
+    {
+    "ssid": "Redmi 10",
+    "password": "98683968"
+  },
   {
     "ssid": "Rostelecom_51721",
     "password": "23e4b821"
@@ -6,10 +14,6 @@
   {
     "ssid": "GSLine_100_2.4GHz",
     "password": "19911234"
-  },
-  {
-    "ssid": "Redmi 10",
-    "password": "98683968"
   },
   {
     "ssid": "BeelineSM25_FB47",

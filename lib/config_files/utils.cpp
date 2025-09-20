@@ -40,12 +40,16 @@ void initalizePins() {
         digitalWrite(D7, RELAY_OFF);
 }
 
-int get_internal_pin(const int pin) {
-    auto it = pinToName.find(pin);
-    if (it != pinToName.end()) {
-         return it->second;  // 👉 value
-    }
-    return -1; // not found
+int get_internal_pin(const std::string &device_name) {
+
+
+    if (device_name == "device_1") return D1;
+    if (device_name == "device_2") return D2;
+    if (device_name == "device_3") return D5;
+    if (device_name == "device_4") return D6;
+    if (device_name == "device_5") return D7;
+    Logger::log_error("Unknown device name: " + String(device_name.c_str()));
+    return -1;
 }
 
 int get_external_pin(const int name) {

@@ -18,7 +18,8 @@ void LocalDevice::handleJob(const JobParams& job) {
 
 void LocalDevice::internal_handleJob(const JobParams& job) {
     
-    int internal_pin = get_internal_pin(job.pin);
+    int internal_pin = get_internal_pin(job.device_name);
+    Logger::log_info("Device on pin " + String(device_pin_) + " checking for job with internal pin " + String(internal_pin));
     if(device_pin_ == internal_pin) {
 
         JobParams job_copy = job; 

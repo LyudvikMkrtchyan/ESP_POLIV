@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 #include <Arduino.h>
 
 #define RELAY_ON  HIGH
@@ -8,7 +9,7 @@
 
 
 
-int get_internal_pin(const int external_pin);
+int get_internal_pin(const std::string &device_name);
 int get_external_pin(const int internal_pin);
 
 void setup_wifi();

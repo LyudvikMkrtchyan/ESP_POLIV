@@ -1,5 +1,6 @@
 #include "device_manager.h"
-
+#include "job_params.h"
+#include "../3rd_part/logger.h"
 DeviceManager::DeviceManager():devices_head_(nullptr) {
     init_devices();
 }
@@ -25,6 +26,10 @@ void DeviceManager::init_devices() {
 }
 
 void DeviceManager::handele_job(const JobParams& job) {
+    JobParams job_copy = job;
+    job_copy.pin = get_pin_by_device_name(job_copy.device_name); // Создаем копию job
+
+    Logger::log_info("Handling job: " + job_copy.toJson());
     if(devices_head_) {
         devices_head_->handleJob(job);
     }
@@ -41,3 +46,8 @@ void DeviceManager::print_state() {
         Serial.println(); 
     }
 }
+
+  int DeviceManager::get_pin_by_device_name(const std::string& device_name) {
+
+        return get_internal_pin(device_name);
+    }

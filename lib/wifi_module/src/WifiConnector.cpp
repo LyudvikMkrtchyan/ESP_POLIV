@@ -84,41 +84,71 @@ void WifiConnector::connect_to_wifi() {
         return;
     }
 
-    for (const auto& cred : wifi_credentials_list_) {
-        Serial.println(F("==================================="));
-        Serial.print(F("[WiFi] Trying SSID: "));
-        Serial.println(cred.get_ssid());
+    // 🔎 Сканирование всех доступных сетей
+    Serial.println(F("[WiFi] Scanning for available networks..."));
+    int networksFound = WiFi.scanNetworks();
+    if (networksFound == 0) {
+        Serial.println(F("[WiFi] No networks found."));
+        return;
+    }
 
-        WiFi.mode(WIFI_STA);
-        WiFi.begin(cred.get_ssid().c_str(), cred.get_password().c_str());
+    Serial.print(F("[WiFi] Found "));
+    Serial.print(networksFound);
+    Serial.println(F(" networks:"));
 
-        unsigned long startAttemptTime = millis();
-        const unsigned long timeout = 15000;
+    // Вывод списка сетей
+    for (int i = 0; i < networksFound; i++) {
+        Serial.print("  ");
+        Serial.print(WiFi.SSID(i));
+        Serial.print(" (RSSI: ");
+        Serial.print(WiFi.RSSI(i));
+        Serial.println(" dBm)");
+    }
 
-        while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
-            delay(500);
-            Serial.print(F("."));
-        }
-        Serial.println();
+    // 🚀 Попытка подключения к сетям из списка, если они есть в найденных
+    for (int i = 0; i < networksFound; i++) {
+        String ssid = WiFi.SSID(i);
 
-        if (WiFi.status() == WL_CONNECTED) {
-            Serial.println(F("[WiFi] Connected successfully!"));
-            Serial.print(F("[WiFi] SSID: "));
-            Serial.println(WiFi.SSID());
-            Serial.print(F("[WiFi] IP Address: "));
-            Serial.println(WiFi.localIP());
-            Serial.print(F("[WiFi] Signal strength (RSSI): "));
-            Serial.print(WiFi.RSSI());
-            Serial.println(F(" dBm"));
-            Serial.println(F("==================================="));
-            return;
-        } else {
-            Serial.print(F("[WiFi] Failed to connect to SSID: "));
-            Serial.println(cred.get_ssid());
+        // проверка: есть ли эта сеть в нашем списке
+        for (const auto& cred : wifi_credentials_list_) {
+            if (ssid == cred.get_ssid()) {
+                Serial.println(F("==================================="));
+                Serial.print(F("[WiFi] Trying SSID: "));
+                Serial.println(ssid);
+
+                WiFi.mode(WIFI_STA);
+                WiFi.begin(cred.get_ssid().c_str(), cred.get_password().c_str());
+
+                unsigned long startAttemptTime = millis();
+                const unsigned long timeout = 15000;
+
+                while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+                    delay(500);
+                    Serial.print(F("."));
+                }
+                Serial.println();
+
+                if (WiFi.status() == WL_CONNECTED) {
+                    Serial.println(F("[WiFi] Connected successfully!"));
+                    Serial.print(F("[WiFi] SSID: "));
+                    Serial.println(WiFi.SSID());
+                    Serial.print(F("[WiFi] IP Address: "));
+                    Serial.println(WiFi.localIP());
+                    Serial.print(F("[WiFi] Signal strength (RSSI): "));
+                    Serial.print(WiFi.RSSI());
+                    Serial.println(F(" dBm"));
+                    Serial.println(F("==================================="));
+                    return;
+                } else {
+                    Serial.print(F("[WiFi] Failed to connect to SSID: "));
+                    Serial.println(ssid);
+                }
+            }
         }
     }
 
     Serial.println(F("[WiFi] Could not connect to any configured network."));
 }
+
 
 
