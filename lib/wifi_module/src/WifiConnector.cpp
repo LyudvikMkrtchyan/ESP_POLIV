@@ -63,7 +63,7 @@ std::vector<WiFiCredentials> WifiConnector::load_wifi_credentials_from_config(co
     return creds;
 }
 
-bool WifiConnector::has_connection() {
+bool WifiConnector::has_connection(const std::string& module_name) {
     
     int reconect_attempts = 5;
     while(reconect_attempts)
@@ -72,6 +72,8 @@ bool WifiConnector::has_connection() {
             return true;
         }
         connect_to_wifi();
+        reconect_attempts--;
+        delay(1000);
     }
     return false;
 }

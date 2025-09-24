@@ -16,7 +16,7 @@ JobParams::JobParams()
         description("") {}
 
 
-bool JobParams::fromJson(const String& jsonStr) 
+bool JobParams::fromJson(const std::string& jsonStr) 
 {
     StaticJsonDocument<512> doc;
     DeserializationError error = deserializeJson(doc, jsonStr);
@@ -70,19 +70,12 @@ String JobParams::toJson() const
     doc["execution_second"] = execution_second;
     doc["end_timestamp"] = end_timestamp;
     doc["device_name"] = device_name;
+    doc["job_type"] = jobTypeEnumToStirng(job_type);
+    doc["job_status"] = jobStatusEnumToString(job_status);
 
-    switch (job_type) {
-        case JobType::JOB: doc["job_type"] = "JOB"; break;
-        case JobType::CONFIGURATION: doc["job_type"] = "CONFIGURATION"; break;
-        default: doc["job_type"] = "Unknown"; break;
-    }
 
-    switch (job_status) {
-        case JobStatus::Running: doc["job_status"] = "Running"; break;
-        case JobStatus::Completed: doc["job_status"] = "Completed"; break;
-        case JobStatus::Failed: doc["job_status"] = "Failed"; break;
-        default: doc["job_status"] = "Pending"; break;
-    }
+
+
 
     String output;
     serializeJson(doc, output);
@@ -100,6 +93,31 @@ bool JobParams::isValidJobType(int value) {
             return true;
         default:
             return false;
+    }
+}
+
+std::string jobTypeEnumToStirng(JobType type)
+{
+    switch(type)
+    {
+        case JobType::SINGLE_ON:     return "SINGLE_ON";
+        case JobType::SINGLE_OFF:    return "SINGLE_OFF";
+        case JobType::JOB:           return "JOB";
+        case JobType::CONFIGURATION: return "CONFIGURATION";
+        default:                     return "Unknown";
+    }
+}
+
+std::string jobStatusEnumToString(JobStatus status)
+{
+    switch(status)
+    {
+        case JobStatus::Pending:   return "Pending";
+        case JobStatus::Accepted:   return "Accepted";
+        case JobStatus::Running:   return "Running";
+        case JobStatus::Completed: return "Completed";
+        case JobStatus::Failed:    return "Failed";
+        default:                   return "Unknown";
     }
 }
 

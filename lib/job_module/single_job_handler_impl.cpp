@@ -1,5 +1,6 @@
 #include "single_job_handler_impl.h"
 #include "logger.h"
+#include "../config_files/utils.h"
 
 
 void DefaultSingleJobHandler::handle(const JobParams& job) {

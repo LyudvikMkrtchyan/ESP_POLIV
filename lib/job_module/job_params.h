@@ -3,22 +3,26 @@
 #include <ArduinoJson.h>
 
 #include "../device_module/device_options.h"
-#include "../config_files/utils.h"
 
 enum class JobType {
-    Unknown,
-    SINGLE_ON,
-    SINGLE_OFF,
-    JOB,
-    CONFIGURATION
+    Unknown = 0,
+    SINGLE_ON = 1,
+    SINGLE_OFF = 2,
+    JOB = 3,
+    CONFIGURATION = 4
 };
 
 enum class JobStatus {
     Pending,
+    Accepted, 
     Running,
     Completed,
     Failed
 };
+
+std::string jobTypeEnumToStirng(JobType type);
+
+std::string jobStatusEnumToString(JobStatus status);
 
 struct JobParams {
     JobType job_type;
@@ -35,7 +39,7 @@ struct JobParams {
     JobParams();
     
     // Парсинг из JSON
-    bool fromJson(const String& jsonStr) ;
+    bool fromJson(const std::string& jsonStr) ;
 
     // Сериализация в JSON
     String toJson()const ;

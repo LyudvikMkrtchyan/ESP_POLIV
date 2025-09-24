@@ -1,11 +1,15 @@
 #include "device_impl.h"
 #include "job_handlers.h"
 #include "logger.h"
+#include "../config_files/utils.h"
+#include <exception>
+
+
 
 void LocalDevice::setup(int device_pin) {
     device_pin_ = device_pin;
     pinMode(device_pin, OUTPUT);
-    digitalWrite(device_pin, HIGH); // выключаем устройство по умолчанию
+    digitalWrite(device_pin, RELAY_OFF); // выключаем устройство по умолчанию
 }
 
 void LocalDevice::handleJob(const JobParams& job) {
@@ -33,10 +37,21 @@ void LocalDevice::internal_handleJob(const JobParams& job) {
 void LocalDevice::switch_job_type_and_handle(const JobParams& job) {
     switch(job.job_type) {
         case JobType::SINGLE_ON:
-        case JobType::SINGLE_OFF:       
-            JobHandlers::get_single_job_handler()->handle(job);
+        case JobType::SINGLE_OFF:
+        {
+            try
+            {
+                JobHandlers::get_single_job_handler()->handle(job);
+            }
+            catch(const std::exception& ex)
+            {
+                std::string error_text = "JobHandlers::get_single_job_handler()->handle(job); error text " + std::string(ex.what());
+                                            
+                Logger::log_error(error_text);
+            }
+
             break;
-            
+        }   
         default:
             Logger::log_warning("Unknown job type for device on pin: " + String(device_pin_));
             break;

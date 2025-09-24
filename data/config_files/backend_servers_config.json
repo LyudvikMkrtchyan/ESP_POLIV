@@ -8,13 +8,13 @@
         "ip_address": "86.107.197.36"
       }
     },
-    {
-      "type": "HTTP",
-      "params": {
-        "port": 1883,
-        "ip_address": "10.0.0.5"
-      }
-    }
+    // {
+    //   "type": "HTTP",
+    //   "params": {
+    //     "port": 1883,
+    //     "ip_address": "10.0.0.5"
+    //   }
+    // }
   ]
 }
 http://86.107.197.36:11072/single_tasks/switches.html

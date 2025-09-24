@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "readers_base.hpp"
 #include <Arduino.h>
 #include <set>
 #include <WifiConnector.h>
@@ -69,7 +70,7 @@ void setup_wifi() {
   WifiConnector::init(wifi_connector_params);
   WifiConnector::getInstance().connect_to_wifi();
 
-    if (WifiConnector::getInstance().has_connection()) {
+    if (WifiConnector::getInstance().has_connection("Setup")) {
         Logger::log_info("WiFi connected successfully.");
     } else {
         Logger::log_warning(String("Failed to connect to WiFi. [") +
@@ -80,8 +81,15 @@ void setup_wifi() {
 }
 void setup_backend_servers() {
     // BackendServers подключение через твой класс
-  std::string backend_server_config_file_path = "/config_files/backend_servers_config.json";
- Logger::log_info("Initializing Backend Servers with config file: " + String(backend_server_config_file_path.c_str()));
-  BackendServers::init(backend_server_config_file_path);
+
+    atl::File backend_server_config_file;
+    backend_server_config_file.file_path =  "/config_files/backend_servers_config.json";
+    backend_server_config_file.file_type = atl::FileType::LOCAL_FILE;
+  
+    std::string backend_server_config_file_path = "/config_files/backend_servers_config.json";
+
+
+    Logger::log_info("Initializing Backend Servers with config file: " + String(backend_server_config_file_path.c_str()));
+    BackendServers::init(backend_server_config_file_path);
 
 }

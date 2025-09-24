@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <vector>
 #include "WiFiCredentials.h"
+#include <string>
 
 class WifiConnector {
 public:
@@ -21,12 +22,12 @@ public:
     WifiConnector& operator=(WifiConnector&&) = delete;
 
     void connect_to_wifi();
-    bool has_connection();
+    bool has_connection(const std::string& module_name);
 
 private:
     WifiConnector() = default;  
     std::vector<WiFiCredentials> load_wifi_credentials_from_config(const char* filePath);
 
     Params params_;
-    std::vector<WiFiCredentials> wifi_credentials_list_; // ✅ правильное имя
+    std::vector<WiFiCredentials> wifi_credentials_list_;
 };

@@ -11,7 +11,7 @@ public:
     };
 
     WifiConnector(const WifiConnector::Params& params);
-    bool has_connection();
+    bool has_connection(const std::string& module_name);
     void connect_to_wifi();
 
 private:
