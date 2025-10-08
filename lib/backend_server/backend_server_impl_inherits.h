@@ -2,12 +2,21 @@
 
 #include <backend_server_impl_base.h>
 #include "backend_server_params.h"
+class HttpServerResponse : public ResponseBase
+{
+public:
+    HttpServerResponse(std::string);
+    std::string get_response_body()override;
+private:
+    std::string request_body;
+
+};
 
 class HttpServer: public BackendServerImplBase
 {
     public: 
         HttpServer(const backend_server::BackendServerParams& params);
-        void send_request(const backend_server::RequestParams& request_params) override;
+        HttpServerResponse* send_request(const backend_server::RequestParams& request_params) override;
         // void start() override;
         // void stop() override;
         // bool isRunning() const override;

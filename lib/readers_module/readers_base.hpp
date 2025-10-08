@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "logger.h"
 namespace atl
 {
 
@@ -17,7 +18,10 @@ namespace atl
     class FileReaderBase
     {
     public:
-        FileReaderBase(const File& file): file_(file){}
+        FileReaderBase(const File& file): file_(file)
+        {
+            Logger::log_debug("FileReaderBase::FileReaderBase is runned .");
+        }
         virtual std::string read() = 0;
 
     protected:

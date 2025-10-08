@@ -90,6 +90,6 @@ void setup_backend_servers() {
 
 
     Logger::log_info("Initializing Backend Servers with config file: " + String(backend_server_config_file_path.c_str()));
-    BackendServers::init(backend_server_config_file_path);
+    BackendServers::init(backend_server_config_file);
 
 }

@@ -1,0 +1,5 @@
+{
+  "output_file_loaction": "SD",
+  "output_file_dir" : "log",
+  "output_file_prefix" : "esp_logs"
+}

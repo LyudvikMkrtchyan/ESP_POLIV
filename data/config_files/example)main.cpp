@@ -1,123 +1,69 @@
-// #include <ESP8266WiFi.h>
-// #include <PubSubClient.h>
-// #include <WifiConnector.h>
-// #include <WiFiCredentials.h>
-// #include <backend_server.h>
-// #include <job_params.h>
-// #include "device_manager.h"
-// #include <string.h>
-
-
-// #define GREEN_LAMP D5
-
-
-// // MQTT параметры
-// const char* mqtt_server = "86.107.197.36";   // IP твоего брокера
-// const int mqtt_port = 1883;                  // стандартный порт MQTT
-// const char* mqtt_topic = "poliv/commands";         // топик, который слушаешь
-
-// WiFiClient espClient;
-// PubSubClient client(espClient);
-// JobParams currentJob;  // текущая задача
-// bool jobReceived = false; // флаг, что задача получена
-// DeviceManager device_manager;
-
-// // // Коллбэк — вызывается при получении сообщения
-// // void callback(char* topic, byte* payload, unsigned int length) {
-  
-// //   std::string msg;
-// //   for (unsigned int i = 0; i < length; i++) {
-// //     msg += (char)payload[i];
-// //   }
-
-
-//   //Serial.println("message: " + msg);
-
-//   // if (currentJob.fromJson(msg)) {
-//   //   Serial.println("Новая задача получена!");
-//   //   Serial.println("" + currentJob.toJson());
-//   //   jobReceived = true;
-//   // }
-// //}
-
-
-// // void setup() {
-// //   Serial.begin(9600);
-// //   // initalizePins();
-// //   // setup_wifi();
-// //   // setup_backend_servers();
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+#include <WifiConnector.h>
+#include <WiFiCredentials.h>
+#include <backend_server.h>
+#include <job_params.h>
+#include "device_manager.h"
+#include <string.h>
+#include "utils.h"
 
 
 
-// //   // // Настройка MQTT
-// //   // client.setServer(mqtt_server, mqtt_port);
-// //   // client.setCallback(callback);
+#define GREEN_LAMP D5
 
-// //   // auto backend_servers = BackendServers::getInstance();
-// //   // backend_server::RequestParams request_params;
-// //   // request_params.type = backend_server::RequestType::POST;
-// //   // request_params.endpoint = "ping";
-// //   // request_params.body = "{\"ping\": \"pong\"}";
-// //   // backend_servers.send_request(request_params);
-// // }
 
-// // Функция для переподключения к MQTT, если связь упала
-// // void reconnect() {
-// //   while (!client.connected()) {
-// //     Serial.print("Подключаюсь к MQTT...");
-// //     if (client.connect("ESP8266Client")) {  // client ID должен быть уникальным
-// //       Serial.println("успешно!");
-// //       client.subscribe(mqtt_topic);
+// MQTT параметры
+const char* mqtt_server = "86.107.197.36";   // IP твоего брокера
+const int mqtt_port = 1883;                  // стандартный порт MQTT
+const char* mqtt_topic = "poliv/commands";         // топик, который слушаешь
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+JobParams currentJob;  // текущая задача
+bool jobReceived = false; // флаг, что задача получена
+DeviceManager* device_manager;
+
+
+void setup() {
+  Serial.begin(9600);
+  initalizePins();
+  setup_wifi();
+  setup_backend_servers();
+
+  // Mqtt broker parmas
+
+
+  MqttManagerBase::Params mqtt_params_;
+
+mqtt_params_.clientId = "ESP_MAIN";
+mqtt_params_.host = "86.107.197.36";
+mqtt_params_.port = 1883;
+mqtt_params_.keepAlive = 60;
+mqtt_params_.cleanSession = true;
+mqtt_params_.username = "myUser";
+mqtt_params_.password = "myPassword";
+
+
+
+  device_manager = new DeviceManager(mqtt_params_);
+
+  auto backend_servers = BackendServers::getInstance();
+  backend_server::RequestParams request_params;
+  request_params.type = backend_server::RequestType::POST;
+  request_params.endpoint = "ping";
+  request_params.body = "{\"ping\": \"pong\"}";
+  backend_servers.send_request(request_params);
+}
+
+
+
+void loop(){
+    /// this loop is detected messiq form mqtt server
+    device_manager->loop();
+
+    /// this funkcin is check timer job list and do job:
+    device_manager->iterate_over_the_timer_job_list_();
+
     
-
-// //         digitalWrite(GREEN_LAMP, RELAY_ON);
-// //         digitalWrite(D1, RELAY_ON);
-// //         digitalWrite(D2, RELAY_ON);
-// //         delay(500);
-// //         digitalWrite(GREEN_LAMP, RELAY_OFF);
-// //         digitalWrite(D1, RELAY_OFF);
-// //         digitalWrite(D2, RELAY_OFF);
-// //         delay(500);
-
-// //          digitalWrite(GREEN_LAMP, RELAY_ON);
-// //         digitalWrite(D1, RELAY_ON);
-// //         digitalWrite(D2, RELAY_ON);
-// //         delay(500);
-// //         digitalWrite(GREEN_LAMP, RELAY_OFF);
-// //         digitalWrite(D1, RELAY_OFF);
-// //         digitalWrite(D2, RELAY_OFF);
-// //         delay(500);
-
-// //          digitalWrite(GREEN_LAMP, RELAY_ON);
-// //         digitalWrite(D1, RELAY_ON);
-// //         digitalWrite(D2, RELAY_ON);
-// //         delay(500);
-// //         digitalWrite(GREEN_LAMP, RELAY_OFF);
-// //         digitalWrite(D1, RELAY_OFF);
-// //         digitalWrite(D2, RELAY_OFF);
-// //         delay(500);
-
-
-
-  
-// //     } else {
-// //       Serial.print("ошибка, rc=");
-// //       Serial.print(client.state());
-// //       Serial.println(" пробую снова через 5 сек");
-// //       delay(5000);
-// //     }
-// //   }
-// // }
-
-
-// void setup() {
-//   Serial.begin(9600);
-//   pinMode(D1, OUTPUT);
-//   digitalWrite(D1, HIGH); // должно быть OFF
-//   Serial.println("Starting...");
-//   delay(2000);
-//   digitalWrite(D1, LOW);  // должно быть ON
-// }
-// void loop() {
-//   //device_manager.loop();
-// }
+}

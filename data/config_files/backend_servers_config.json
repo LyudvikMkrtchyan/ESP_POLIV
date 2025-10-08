@@ -1,5 +1,10 @@
 {
   "output_file_name": "backend_server_output.log",
+
+  "output_file_loaction": "SD",
+  "output_file_dir" : "log",
+  "output_file_prefix" : "esp_logs",
+  
   "servers": [
     {
       "type": "HTTP",
@@ -7,14 +12,6 @@
         "port": 11071,
         "ip_address": "86.107.197.36"
       }
-    },
-    // {
-    //   "type": "HTTP",
-    //   "params": {
-    //     "port": 1883,
-    //     "ip_address": "10.0.0.5"
-    //   }
-    // }
+    }
   ]
 }
-http://86.107.197.36:11072/single_tasks/switches.html

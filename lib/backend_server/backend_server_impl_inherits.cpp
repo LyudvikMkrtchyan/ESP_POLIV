@@ -4,28 +4,45 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include "logger.h"
+#include <string>
 
+
+/// ResponseBase Implementation
+
+ResponseBase::ResponseBase(std::string response_body):response_body_(response_body){}
+
+///HttpServerResponse Implementation
+
+HttpServerResponse::HttpServerResponse(std::string response_body):ResponseBase(response_body){}
+
+
+std::string HttpServerResponse::get_response_body()
+{
+    return response_body_;
+}
+
+
+
+/// HttpServer Implementacion
 HttpServer::HttpServer(const backend_server::BackendServerParams& params) : params_(params){}
 
-
-
-void HttpServer::send_request(const backend_server::RequestParams& request_params) {
+HttpServerResponse* HttpServer::send_request(const backend_server::RequestParams& request_params) {
+    Logger::log_debug("HttpServer::send_request is runned");
+    
     if (WiFi.status() != WL_CONNECTED) {
         Logger::log_error("WiFi not connected, cannot send HTTP request");
-        return;
+        return nullptr;
     }
 
     WiFiClient client;
     HTTPClient http;
 
-    // Формируем URL
     String url = "http://" + params_.ip_address + ":" + String(params_.port) + "/" + request_params.endpoint;
-
     Logger::log_info("Sending HTTP request to: " + url);
 
     if (!http.begin(client, url)) {
         Logger::log_error("Failed to begin HTTP connection");
-        return;
+        return nullptr;
     }
 
     int httpCode = -1;
@@ -52,16 +69,19 @@ void HttpServer::send_request(const backend_server::RequestParams& request_param
         default:
             Logger::log_warning("Unknown HTTP request type");
             http.end();
-            return;
+            return nullptr;
     }
 
+    std::string response_body = "";
     if (httpCode > 0) {
-        Logger::log_info("HTTP Response code: " + String(httpCode));
-        String payload = http.getString();
-        Logger::log_info("Response: " + payload);
+        Logger::log_debug("HTTP Response code: " + String(httpCode));
+        response_body = http.getString().c_str();
+        Logger::log_debug("HTTP Response body: " + response_body);
     } else {
         Logger::log_error("HTTP Request failed, error: " + String(http.errorToString(httpCode).c_str()));
     }
-
+    HttpServerResponse* response = new HttpServerResponse(response_body);
+    
     http.end();
+    return response;
 }

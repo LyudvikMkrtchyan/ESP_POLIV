@@ -9,24 +9,41 @@
 #include <string>
 
 
-DeviceManager::DeviceManager(const MqttManagerBase::Params mqtt_params) : devices_head_(nullptr), mqtt_manager_(nullptr), mqtt_params_(mqtt_params) {
-  Serial.begin(9600);
-    Serial.println("DeviceManager starting..."); 
-    // 1. Инициализация устройств
-    init_devices();
+DeviceManager::DeviceManager(std::unique_ptr<Device> devices_head,
+                             std::unique_ptr<MqttManagerBase> mqtt_manager,
+                             const MqttManagerBase::Params& mqtt_params,
+                             std::unique_ptr<TimerJobsManagerBase> timer_job,
+                             std::unique_ptr<ConfigsJobsManagerBase> config_job,
+                             const std::string& message_topic,
+                             const std::string& answer_topic)
+    : devices_head_(std::move(devices_head))
+    , mqtt_manager_(std::move(mqtt_manager))
+    , mqtt_params_(mqtt_params)
+    , on_mqtt_message_topic_(message_topic)      // сначала члены, которые объявлены раньше
+    , on_mqtt_answer_topic_(answer_topic)
+    , timer_job_(std::move(timer_job))
+    , config_job_(std::move(config_job))
 
+{
+    Serial.begin(9600);
+    Serial.println("DeviceManager starting...");
 
-    mqtt_manager_ = new MqttManagerEsp(mqtt_params_);
+    // MQTT callback
+    if (mqtt_manager_) {
+        mqtt_manager_->set_topic_callback(on_mqtt_message_topic_,
+            [this](const std::string& topic, const std::string& payload) {
+                this->on_mqtt_message(topic, payload);
+            });
+        mqtt_manager_->connect();
+        mqtt_manager_->subscribe(on_mqtt_message_topic_);
+    }
 
-
-    mqtt_manager_->set_topic_callback(on_mqtt_message_topic_,
-        [this](const std::string& topic, const std::string& payload) {
-            this->on_mqtt_message(topic, payload);
-        });
-
-    mqtt_manager_->connect();
-    mqtt_manager_->subscribe(on_mqtt_message_topic_);
+    // Можно инициализировать устройства, если нужно
+    if (!devices_head_) {
+        init_devices();
+    }
 }
+
 
 void DeviceManager::init_devices() {
     // Инициализация устройств и цепочки ответственности
@@ -45,7 +62,7 @@ void DeviceManager::init_devices() {
     LocalDevice* device5 = new LocalDevice(device4);
     device5->setup(D7); // Пин D7 (GPIO13)
 
-    devices_head_ = device5; // Голова цепочки
+    devices_head_ = std::unique_ptr<LocalDevice>(device5); 
 }
 
 void DeviceManager::handle_job(const JobParams& job) {
@@ -104,6 +121,18 @@ void DeviceManager::loop() {
         mqtt_manager_->loop();
     }
 }
+
+void DeviceManager::iterate_over_the_timer_job_list_()
+{
+    timer_job_->iterate_over_the_list();
+}
+
+void DeviceManager::configuration_operations()
+{
+    config_job_->run_configs_loop();
+}
+
+
 
 #include <ArduinoJson.h>
 

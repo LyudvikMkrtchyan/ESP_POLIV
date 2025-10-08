@@ -12,19 +12,15 @@
     "password": "23e4b821"
   },
   {
-    "ssid": "GSLine_100_2.4GHz",
-    "password": "19911234"
-  },
-  {
     "ssid": "BeelineSM25_FB47",
     "password": "03183505"
   },
   {
     "ssid": "S22",
     "password": "12345678"
-  },
-  {
-    "ssid": "GSLine_8",
-    "password": "09011991"
   }
 ]
+// {
+//   "ssid": "GSLine_100_2.4GHz",
+//   "password": "19911234"
+// }
