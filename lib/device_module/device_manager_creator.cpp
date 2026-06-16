@@ -1,4 +1,7 @@
 #include "device_manager_creator.hpp"
+#include <ArduinoJson.h>
+#include "../readers_module/readers_base.hpp"
+#include "../3rd_part/logger.h"
 
 
 // Инициализация устройств
@@ -26,20 +29,33 @@ DeviceManagerCreator& DeviceManagerCreator::setup_config_job()
 }
 
 // Настройка MQTT
-DeviceManagerCreator& DeviceManagerCreator::setup_mqtt() {
+DeviceManagerCreator& DeviceManagerCreator::setup_mqtt(const std::string& mqtt_config_file_path) {
 
-    MqttManagerBase::Params mqtt_params_;
+    atl::File mqtt_config_file;
+    mqtt_config_file.file_path = mqtt_config_file_path;
+    mqtt_config_file.file_type = atl::FileType::LOCAL_FILE;
 
-    mqtt_params_.clientId = "ESP_MAIN";
-    mqtt_params_.host = "86.107.197.36";
-    mqtt_params_.port = 1883;
-    mqtt_params_.keepAlive = 60;
-    mqtt_params_.cleanSession = true;
-    mqtt_params_.username = "myUser";
-    mqtt_params_.password = "myPassword";
-    
+    std::string content = read_file_content(mqtt_config_file);
+
+    StaticJsonDocument<512> doc;
+    DeserializationError error = deserializeJson(doc, content);
+    if (error) {
+        Logger::log_error("MQTT config JSON parse error: " + String(error.c_str()));
+    } else {
+        mqtt_params_.clientId     = doc["client_id"].as<std::string>();
+        mqtt_params_.host         = doc["host"].as<std::string>();
+        mqtt_params_.port         = doc["port"].as<int>();
+        mqtt_params_.keepAlive    = doc["keep_alive"].as<int>();
+        mqtt_params_.cleanSession = doc["clean_session"].as<bool>();
+        mqtt_params_.username     = doc["username"].as<std::string>();
+        mqtt_params_.password     = doc["password"].as<std::string>();
+        mqtt_params_.message_topic = doc["message_topic"].as<std::string>();
+        mqtt_params_.answer_topic  = doc["answer_topic"].as<std::string>();
+        Logger::log_info(String("MQTT config loaded: ") + mqtt_params_.host.c_str() + ":" + String(mqtt_params_.port));
+    }
+
     mqtt_manager_ = std::make_unique<MqttManagerEsp>(mqtt_params_);
-    
+
     return *this;
 }
 
@@ -50,8 +66,6 @@ std::unique_ptr<DeviceManager> DeviceManagerCreator::build() {
         std::move(mqtt_manager_),
         mqtt_params_,
         std::move(timer_job_),
-        std::move(config_job_),
-        message_topic_,
-        answer_topic_
+        std::move(config_job_)
     );
 }

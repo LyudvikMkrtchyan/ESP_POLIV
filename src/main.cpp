@@ -32,28 +32,17 @@ void setup() {
   setup_wifi();
   setup_backend_servers();
 
-  // Mqtt broker parmas
-
-
-MqttManagerBase::Params mqtt_params_;
-
-mqtt_params_.clientId = "ESP_MAIN";
-mqtt_params_.host = "86.107.197.36";
-mqtt_params_.port = 1883;
-mqtt_params_.keepAlive = 60;
-mqtt_params_.cleanSession = true;
-mqtt_params_.username = "myUser";
-mqtt_params_.password = "myPassword";
 
 
 
-DeviceManagerCreator device_manager_creator;
+  const std::string mqtt_config_file_path = "/config_files/mqtt_config.json";
 
+  DeviceManagerCreator device_manager_creator;
   device_manager = device_manager_creator
     .init_devices()
     .setup_timer_job()
     .setup_config_job()
-    .setup_mqtt()
+    .setup_mqtt(mqtt_config_file_path)
     .build();
 
 

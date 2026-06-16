@@ -1,0 +1,2 @@
+- MQTT configuration (broker, port, credentials, topics) moved from hardcoded source to data/config_files/mqtt_config.json.
+- setup_mqtt() now accepts a config file path; message_topic and answer_topic added to MqttManagerBase::Params.

@@ -1,0 +1,11 @@
+{
+  "client_id": "ESP_MAIN",
+  "host": "86.107.197.36",
+  "port": 1883,
+  "keep_alive": 60,
+  "clean_session": true,
+  "username": "myUser",
+  "password": "myPassword",
+  "message_topic": "autowatering/module_1/command",
+  "answer_topic": "autowatering/module_1/status"
+}

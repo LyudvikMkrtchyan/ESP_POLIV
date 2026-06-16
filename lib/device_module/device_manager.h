@@ -13,9 +13,7 @@ public:
                   std::unique_ptr<MqttManagerBase> mqtt_manager,
                   const MqttManagerBase::Params& mqtt_params,
                   std::unique_ptr<TimerJobsManagerBase> timer_job,
-                  std::unique_ptr<ConfigsJobsManagerBase> config_job,
-                  const std::string& message_topic = "autowatering/module_1/command",
-                  const std::string& answer_topic = "autowatering/module_1/status");
+                  std::unique_ptr<ConfigsJobsManagerBase> config_job);
 
     void handle_job(const JobParams& job);
     void print_state();

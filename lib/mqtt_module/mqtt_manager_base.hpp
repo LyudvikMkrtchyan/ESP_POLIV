@@ -13,6 +13,8 @@ public:
         bool cleanSession = true;
         std::string username;
         std::string password;
+        std::string message_topic;
+        std::string answer_topic;
     };
 
     using MessageCallback = std::function<void(const std::string& topic,

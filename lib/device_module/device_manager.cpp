@@ -13,14 +13,12 @@ DeviceManager::DeviceManager(std::unique_ptr<Device> devices_head,
                              std::unique_ptr<MqttManagerBase> mqtt_manager,
                              const MqttManagerBase::Params& mqtt_params,
                              std::unique_ptr<TimerJobsManagerBase> timer_job,
-                             std::unique_ptr<ConfigsJobsManagerBase> config_job,
-                             const std::string& message_topic,
-                             const std::string& answer_topic)
+                             std::unique_ptr<ConfigsJobsManagerBase> config_job)
     : devices_head_(std::move(devices_head))
     , mqtt_manager_(std::move(mqtt_manager))
     , mqtt_params_(mqtt_params)
-    , on_mqtt_message_topic_(message_topic)      // сначала члены, которые объявлены раньше
-    , on_mqtt_answer_topic_(answer_topic)
+    , on_mqtt_message_topic_(mqtt_params.message_topic)
+    , on_mqtt_answer_topic_(mqtt_params.answer_topic)
     , timer_job_(std::move(timer_job))
     , config_job_(std::move(config_job))
 

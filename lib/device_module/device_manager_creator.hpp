@@ -12,8 +12,6 @@ private:
     std::unique_ptr<Device> devices_head_;
     std::unique_ptr<MqttManagerBase> mqtt_manager_;
     MqttManagerBase::Params mqtt_params_;
-    std::string message_topic_ = "autowatering/module_1/command";
-    std::string answer_topic_ = "autowatering/module_1/status";
     std::unique_ptr<TimerJobsManagerBase> timer_job_;
     std::unique_ptr<ConfigsJobsManagerBase> config_job_;
 
@@ -22,7 +20,7 @@ public:
     DeviceManagerCreator& init_devices();
     DeviceManagerCreator& setup_timer_job();
     DeviceManagerCreator& setup_config_job();
-    DeviceManagerCreator& setup_mqtt();
+    DeviceManagerCreator& setup_mqtt(const std::string& mqtt_config_file_path);
 
     std::unique_ptr<DeviceManager> build();
 };
